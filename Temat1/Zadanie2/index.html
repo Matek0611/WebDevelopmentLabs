@@ -1,11 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kółko i krzyżyk</title>
-</head>
-<body>
-    
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Kółko i krzyżyk</title>
+        <style>
+            * {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            #grid {
+                display: grid;
+                grid-template-columns: repeat(3, 150px);
+            }
+
+            .cell {
+                transition: all 0.3s ease;
+                border: 1px solid #333;
+                color: #333;
+                background-color: white;
+                width: 150px;
+                height: 150px;
+                font-size: 50px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .cell:hover {
+                border: 1px solid #777;
+                color: #777;
+                background-color: cornsilk;
+            }
+
+            button {
+                margin: 8px;
+                padding: 5px;
+                border-radius: 5px;
+                border-width: 1px;
+                border-style: solid;
+                border-color: blueviolet;
+                background-color: cornflowerblue;
+                color: white;
+                font-weight: 500;
+                transition: all 0.4s ease;
+                min-width: 40px;
+                min-height: 40px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+
+            button:hover {
+                border-color: cornflowerblue;
+                background-color: blueviolet;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+                    0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            }
+
+            button:active {
+                border-color: blueviolet;
+                background-color: rgb(134, 59, 134);
+            }
+
+            #clear {
+                margin-bottom: 10px;
+            }
+
+            #result {
+                border-radius: 10px;
+                border: 2px dashed bisque;
+                background-color: beige;
+                padding: 15px;
+                margin: 10px;
+                width: 400px;
+            }
+        </style>
+        <script>
+            var player = "X";
+
+            function gen() {
+                const grid = document.getElementById("grid");
+                const result = document.getElementById("result");
+
+                for (i = 0; i < 9; i++) {
+                    let cell = document.createElement("div");
+                    cell.className = "cell";
+                    cell.dataset.value = i;
+                    cell.innerText = "";
+                    grid.appendChild(cell);
+                }
+
+                const cells = document.querySelectorAll(".cell");
+
+                const checkWinner = () => {
+                    const winners = [
+                        [0, 1, 2],
+                        [0, 3, 6],
+                        [0, 4, 8],
+                        [1, 4, 7],
+                        [2, 4, 6],
+                        [2, 5, 8],
+                        [3, 4, 5],
+                        [6, 7, 8],
+                    ];
+
+                    for (const winner of winners) {
+                        const [a, b, c] = winner;
+
+                        if (
+                            cells[a].innerText &&
+                            cells[a].innerText === cells[b].innerText &&
+                            cells[a].innerText === cells[c].innerText
+                        )
+                            return cells[a].innerText;
+                    }
+
+                    for (const cell of cells) {
+                        if (!cell.innerText || cell.innerText === "")
+                            return null;
+                    }
+
+                    return "R";
+                };
+
+                cells.forEach((cell) =>
+                    cell.addEventListener("click", (event) => {
+                        let id = event.target.dataset.value;
+
+                        if (cells[id].innerText === "" && !checkWinner()) {
+                            cells[id].innerText = player;
+                            event.target.innerText = player;
+                            const winner = checkWinner();
+
+                            if (winner) {
+                                result.innerText = (winner === "R") ? "Remis" : `Gracz ${winner} wygrał!`;
+                            } else {
+                                player = (player === "X") ? "O" : "X";
+                            }
+                        }
+                    })
+                );
+
+                document.getElementById("clear").onclick = (event) => {
+                    cells.forEach((cell) => (cell.innerText = ""));
+                    player = "X";
+                    result.innerText = "";
+                };
+            }
+        </script>
+    </head>
+    <body onload="gen()">
+        <button id="clear">Wyczyść planszę</button>
+        <div id="result"></div>
+        <div id="grid"></div>
+    </body>
 </html>

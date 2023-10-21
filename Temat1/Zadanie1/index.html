@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Calculator</title>
+
+        <style>
+            * {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            div {
+                margin-block: 10px;
+            }
+
+            button {
+                margin: 8px;
+                padding: 5px;
+                border-radius: 5px;
+                border-width: 1px;
+                border-style: solid;
+                border-color: blueviolet;
+                background-color: cornflowerblue;
+                color: white;
+                font-weight: 500;
+                transition: all 0.4s ease;
+                min-width: 40px;
+                min-height: 40px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+
+            button:hover {
+                border-color: cornflowerblue;
+                background-color: blueviolet;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            }
+
+            button:active {
+                border-color: blueviolet;
+                background-color: rgb(134, 59, 134);
+            }
+
+            .numkey {
+                font-size: 18px;
+            }
+
+            .eqkey {
+                width: 96px;
+            }
+
+            #panel {
+                width: 200px;
+                color: purple;
+                background-color: lemonchiffon;
+                border-radius: 10px;
+                border: 1px solid purple;
+                padding: 10px;
+                text-align: right;
+            }
+
+            #history p {
+                font-family: "Consolas", "Courier New", Courier, monospace;
+                margin: 5px;
+                padding: 10px;
+                border-radius: 10px;
+                border: 1px dashed gray;
+                width: fit-content;
+            }
+        </style>
+
+        <script>
+            var nums = ["0", "0"];
+            var op = "";
+            var numId = 0;
+
+            function gen() {
+                const main = document.getElementById("main");
+
+                const panel = document.createElement("div");
+                panel.id = "panel";
+                document.body.insertBefore(panel, main);
+
+                const history = document.createElement("div");
+                history.id = "history";
+                document.body.appendChild(history);
+
+                for (let i = 9; i >= 0; i--) {
+                    let key = document.createElement("button");
+
+                    key.innerText = i;
+                    key.onclick = performAction;
+                    key.dataset.value = i;
+                    key.className = "numkey";
+
+                    main.appendChild(key);
+
+                    if ((i + 2) % 4 == 0)
+                        main.appendChild(document.createElement("br"));
+                }
+
+                let btn = document.createElement("button");
+                btn.innerText = "=";
+                btn.className = "numkey eqkey";
+                btn.onclick = performAction;
+                btn.dataset.value = "=";
+                main.appendChild(btn);
+                main.appendChild(document.createElement("br"));
+
+                for (const action of ["+", "-", "*", "/", ".", "C"]) {
+                    btn = document.createElement("button");
+                    btn.innerText = action;
+                    btn.className = "numkey";
+                    btn.onclick = performAction;
+                    btn.dataset.value = action;
+                    main.appendChild(btn);
+
+                    if (action == "/")
+                        main.appendChild(document.createElement("br"));
+                }
+
+                btn = document.createElement("button");
+                btn.innerText = "Usuń";
+                btn.className = "numkey eqkey";
+                btn.onclick = performAction;
+                btn.dataset.value = "Backspace";
+                main.appendChild(btn);
+                main.appendChild(document.createElement("br"));
+
+                btn = document.createElement("button");
+                btn.innerText = "Wyczyść historię (H)";
+                btn.onclick = performAction;
+                btn.dataset.value = "h";
+                main.appendChild(btn);
+                main.appendChild(document.createElement("br"));
+
+                updatePanel();
+
+                document.addEventListener("keydown", (event) =>
+                    handleAction(event.key)
+                );
+            }
+
+            function performAction() {
+                handleAction(this.dataset.value);
+            }
+
+            function equalAction() {
+                if (numId == 0) return;
+
+                let a = Number.parseFloat(nums[0]),
+                    b = Number.parseFloat(nums[1]),
+                    c = 0;
+
+                switch (op) {
+                    case "+": {
+                        c = a + b;
+                        break;
+                    }
+                    case "-": {
+                        c = a - b;
+                        break;
+                    }
+                    case "*": {
+                        c = a * b;
+                        break;
+                    }
+                    case "/": {
+                        c = a / b;
+                        break;
+                    }
+                }
+
+                addToHistory(a, op, b, c);
+
+                numId = 0;
+                nums[0] = c.toString();
+                nums[1] = "0";
+
+                correctValue();
+            }
+
+            function correctValue() {
+                let v = Number.parseFloat(nums[numId]);
+
+                if (!v) {
+                    console.log("Nieprawidłowa wartość: ", v);
+                    nums[numId] = "0";
+                }
+            }
+
+            function handleAction(action) {
+                switch (action) {
+                    case "=": {
+                        equalAction();
+
+                        break;
+                    }
+
+                    case "c":
+                    case "C": {
+                        nums = ["0", "0"];
+                        op = "";
+                        numId = 0;
+
+                        break;
+                    }
+
+                    case "h":
+                    case "H": {
+                        document.getElementById("history").innerHTML = "";
+
+                        break;
+                    }
+
+                    case "Backspace": {
+                        nums[numId] = nums[numId].slice(0, -1);
+
+                        if (!nums[numId].length) nums[numId] = "0";
+
+                        correctValue();
+
+                        break;
+                    }
+
+                    case "0":
+                    case "1":
+                    case "2":
+                    case "3":
+                    case "4":
+                    case "5":
+                    case "6":
+                    case "7":
+                    case "8":
+                    case "9": {
+                        if (nums[numId] == "0") nums[numId] = action;
+                        else nums[numId] += action;
+
+                        correctValue();
+
+                        break;
+                    }
+
+                    case ".":
+                    case ",": {
+                        if (!nums[numId].includes(".")) nums[numId] += ".";
+
+                        break;
+                    }
+
+                    case "+":
+                    case "-":
+                    case "*":
+                    case "/": {
+                        if (numId == 0) {
+                            op = action;
+                            numId++;
+                        } else {
+                            equalAction();
+                            op = action;
+                            numId = 1;
+                        }
+
+                        break;
+                    }
+                }
+
+                updatePanel();
+            }
+
+            function updatePanel() {
+                panel.innerText = nums[numId].toString();
+            }
+
+            function addToHistory(a, oper, b, c) {
+                let his = document.createElement("p");
+                his.innerText = a + " " + oper + " " + b + " = " + c;
+
+                const history = document.getElementById("history");
+
+                history.insertBefore(his, history.firstChild);
+            }
+        </script>
+    </head>
+    <body onload="gen()">
+        <div id="main"></div>
+    </body>
+</html>

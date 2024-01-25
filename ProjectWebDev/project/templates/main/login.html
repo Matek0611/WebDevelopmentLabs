@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %} Logowanie do systemu {% endblock %}
+{% block content %}
+{% load static %}
+
+<style>
+    #login-c {
+        display: flex;
+        align-items: center;
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f9f9f9;
+        min-height: calc(100vh - 60px);
+    }
+
+    .form-signin {
+        max-width: 330px;
+        padding: 15px;
+    }
+
+    .form-signin .form-floating:focus-within {
+        z-index: 2;
+    }
+
+    .form-signin input[type="text"] {
+        margin-bottom: -1px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .form-signin input[type="password"] {
+        margin-bottom: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+</style>
+
+<div class="text-center" id="login-c">
+    <main class="form-signin w-100 m-auto">
+        <form method="post">
+            {% csrf_token %}
+            <img class="mb-4" src="{% static 'logo.svg' %}" alt="" width="72" height="57">
+            <h1 class="h3 mb-3 fw-normal">Logowanie</h1>
+
+            <div class="form-floating">
+                <input type="text" name="username" class="form-control" id="floatingInput" placeholder="login">
+                <label for="floatingInput">Nazwa użytkownika</label>
+            </div>
+            <div class="form-floating">
+                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password">
+                <label for="floatingPassword">Hasło</label>
+            </div>
+            <br>
+
+            {% if messages %}
+                <div>
+                    {% for msg in messages %}
+                        <p>{{ msg }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <button class="w-100 btn btn-lg btn-accent" type="submit">Zaloguj się</button>
+            <p class="mt-5 mb-3 text-muted">© 2023 Marcin Stefanowicz</p>
+        </form>
+    </main>
+</div>
+
+{% endblock %}

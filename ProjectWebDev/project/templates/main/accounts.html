@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %} Konta {% endblock %}
+{% block content %}
+{% load static %}
+{% csrf_token %}
+
+<div class="d-flex flex-column align-items-start justify-content-center flex-wrap me-2 mb-3">
+    <h1 class="text-dark fw-light my-1 fs-2">Moje konto</h1>
+
+    <ul class="breadcrumb fw-semibold fs-base my-1">
+        <li class="breadcrumb-item text-muted">Konta</li>
+        <li class="breadcrumb-item text-dark">Moje konto</li>
+    </ul>
+</div>
+
+<div>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="editself" value="">
+
+        <h5>Dane podstawowe</h5>
+
+        <div class="mb-3 row">
+            <label for="staticUsername" class="col-sm-2 col-form-label text-muted">Nazwa użytkownika</label>
+            <div class="col-sm-10">
+            <input type="text" readonly class="form-control-plaintext" id="staticUsername" value="{{ user.username }}">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label for="inputFirstname" class="col-sm-2 col-form-label text-muted">Imię</label>
+            <div class="col-sm-10">
+            <input type="text" name="first_name" class="form-control" id="inputFirstname" value="{{ user.first_name }}">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label for="inputLastname" class="col-sm-2 col-form-label text-muted">Nazwisko</label>
+            <div class="col-sm-10">
+            <input type="text" name="last_name" class="form-control" id="inputLastname" value="{{ user.last_name }}">
+            </div>
+        </div>
+
+        <h5>Nowe hasło</h5>
+        <p>Jeśli nie chcesz zmieniać hasła, pozostaw poniższe pola puste.</p>
+
+        <div class="mb-3 row">
+            <label for="inputPassword1" class="col-sm-2 col-form-label text-muted">Nowe hasło</label>
+            <div class="col-sm-10">
+            <input type="password" name="password1" class="form-control" id="inputPassword1">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label for="inputPassword2" class="col-sm-2 col-form-label text-muted">Powtórz nowe hasło</label>
+            <div class="col-sm-10">
+            <input type="password" name="password2" class="form-control" id="inputPassword2">
+            </div>
+        </div>
+
+        {% if messages %}
+            <div class="text-danger text-center my-3">
+                {% for msg in messages %}
+                    <p>{{ msg }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button class="btn btn-accent" type="submit">Zmień dane</button>
+        </div>
+    </form>
+</div>
+
+{% if user.is_staff %}
+<div class="d-flex flex-column align-items-start justify-content-center flex-wrap me-2 mt-5 mb-3">
+    <h1 class="text-dark fw-light my-1 fs-2">Pracownicy</h1>
+
+    <ul class="breadcrumb fw-semibold fs-base my-1">
+        <li class="breadcrumb-item text-muted">Konta</li>
+        <li class="breadcrumb-item text-dark">Zarządzanie kontami pracowników</li>
+    </ul>
+</div>
+
+<a href="{% url 'manageuser' %}" class="btn btn-success my-2"><i class="bi bi-person-add me-2"></i>Dodaj pracownika</a>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+        <tr>
+            <th scope="col">Nazwa użytkownika</th>
+            <th scope="col">Imię</th>
+            <th scope="col">Nazwisko</th>
+            <th scope="col" style="text-align: center !important;">Kierownik</th>
+            <th scope="col">&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody class="table-group-divider">
+        {% for u in users %}
+        <tr>
+            <th scope="row">{{ u.username }}</th>
+            <td>{% if u.first_name %}{{ u.first_name }}{% else %}<span class="text-muted">(brak)</span>{% endif %}</td>
+            <td>{% if u.last_name %}{{ u.last_name }}{% else %}<span class="text-muted">(brak)</span>{% endif %}</td>
+            <td class="text-center"><span class="tooltip-wrapper" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{% if u.is_staff %}Tak{% else %}Nie{% endif %}"><i class="bi {% if u.is_staff %}bi-check-circle-fill text-success{% else %}bi-x-circle-fill text-danger{% endif %}"></i></span></td>
+            <td>{% if u not in activeusers %}<span class="tooltip-wrapper" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edytuj pracownika"><a href="/accounts/manage?name={{u.username}}" class="btn btn-sm btn-dark"><i class="bi bi-pencil-fill"></i></a></span>{% else %}<span class="tooltip-wrapper" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Nie można edytować użytkownika, który jest obecnie zalogowany"><a href="#" class="btn btn-sm btn-dark disabled" aria-disabled="true"><i class="bi bi-pencil"></i></a></span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}

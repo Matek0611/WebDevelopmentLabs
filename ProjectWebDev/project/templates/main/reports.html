@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %} Raporty {% endblock %}
+{% block content %}
+{% load static %}
+
+<div class="d-flex flex-column align-items-start justify-content-center flex-wrap me-2 mb-3">
+    <h1 class="text-dark fw-light my-1 fs-2">Generowanie raportu</h1>
+
+    <ul class="breadcrumb fw-semibold fs-base my-1">
+        <li class="breadcrumb-item text-muted">Raporty</li>
+        <li class="breadcrumb-item text-dark">Tworzenie raportu produktu</li>
+    </ul>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="input-group my-3">
+        <div class="form-floating">
+            <input type="text" class="form-control" id="floatingID" name="product_id" placeholder="ID" maxlength="64">
+            <label for="floatingID">Identyfikator produktu</label>
+        </div>
+        <button class="btn btn-success" type="button" id="button-addon2" onclick="navigator.clipboard.readText().then((clipText) => $('#floatingID').val(clipText.substring(0, 64)))"><i class="bi bi-clipboard-fill me-2"></i>Wklej ze schowka</button>
+    </div>
+
+    <div class="form-floating my-3">
+        <textarea class="form-control" placeholder="Komentarz" id="floatingComment" name="comment" style="height: 200px"></textarea>
+        <label for="floatingComment">Komentarz</label>
+    </div>
+
+    <div class="form-check form-switch my-3">
+        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchWiki" name="wiki" checked>
+        <label class="form-check-label" for="flexSwitchWiki">Postaraj się dołączyć informacje o produkcie z Wikipedii</label>
+    </div>
+
+    {% if messages %}
+        <div class="text-danger text-center my-3">
+            {% for msg in messages %}
+                <p>{{ msg }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button class="btn btn-accent" type="submit"><i class="bi bi-file-earmark-pdf-fill me-2"></i>Generuj raport</button>
+    </div>
+</form>
+
+{% endblock %}

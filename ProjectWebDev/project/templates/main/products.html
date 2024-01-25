@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block title %} Produkty {% endblock %}
+{% block content %}
+{% load static %}
+
+<div class="d-flex flex-column align-items-start justify-content-center flex-wrap me-2 mb-3">
+    <h1 class="text-dark fw-light my-1 fs-2">Produkty</h1>
+
+    <ul class="breadcrumb fw-semibold fs-base my-1">
+        <li class="breadcrumb-item text-muted">Produkty</li>
+        <li class="breadcrumb-item text-dark">Lista produktów</li>
+    </ul>
+</div>
+
+{% if messages %}
+    <div class="text-danger text-center my-3">
+        {% for msg in messages %}
+            <p>{{ msg }}</p>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div>
+    <ul class="nav nav-tabs" id="tablistProducts" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="warehouse-tab" data-bs-toggle="tab" data-bs-target="#warehouse-tab-pane"
+                type="button" role="tab" aria-controls="warehouse-tab-pane" aria-selected="true">Produkty w
+                magazynie</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="sold-tab" data-bs-toggle="tab" data-bs-target="#sold-tab-pane" type="button"
+                role="tab" aria-controls="sold-tab-pane" aria-selected="false">Sprzedane produkty</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="tablistContent">
+        <div class="tab-pane fade show active p-3" id="warehouse-tab-pane" role="tabpanel"
+            aria-labelledby="warehouse-tab" tabindex="0">
+            <div class="input-group mb-3">
+                <a href="{% url 'manageproduct' %}" class="btn btn-success"><i class="bi bi-plus-circle me-2"></i>Nowy
+                    produkt</a>
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="product-search" onkeyup="searchTable('product-search', 'products-list-table')"
+                    placeholder="Szukaj produktu...">
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="products-list-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID produktu</th>
+                            <th scope="col">Nazwa</th>
+                            <th scope="col">Dodany przez</th>
+                            <th scope="col">Ilość</th>
+                            <th scope="col">Cena za sztukę</th>
+                            <th scope="col">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        {% for product in products %}
+                        <tr>
+                            <th>
+                                <div class="input-group">
+                                    <input type="text" class="form-control bg-light" placeholder="ID" aria-label="ID"
+                                        id="product-list-id-{{product.id}}" readonly
+                                        style="max-width: 150px !important;" value="{{product.id}}">
+                                    <button class="btn btn-secondary" type="button"
+                                        data-bs-toggle="tooltip" data-bs-placement="right"
+                                        data-bs-title="Kopiuj identyfikator produktu"
+                                        onclick="navigator.clipboard.writeText($('#product-list-id-{{product.id}}').val())"><i
+                                            class="bi bi-clipboard-plus-fill"></i></button>
+                                </div>
+                            </th>
+                            <td>{{product.name}}</td>
+                            <td>{{product.user_added_id.username}}</td>
+                            <td>{{product.amount}}</td>
+                            <td>{{product.price|floatformat:2}} zł</td>
+                            <td><span class="tooltip-wrapper" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edytuj dane produktu lub sprzedaj go"><a href="/products/manage?id={{product.id}}" class="btn btn-sm btn-dark"><i class="bi bi-three-dots"></i></a></span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane fade p-3" id="sold-tab-pane" role="tabpanel" aria-labelledby="sold-tab" tabindex="0">
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="sale-search" onkeyup="searchTable('sale-search', 'sales-list-table')"
+                    placeholder="Szukaj...">
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="sales-list-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID sprzedaży</th>
+                            <th scope="col">Nazwa</th>
+                            <th scope="col">Sprzedany przez</th>
+                            <th scope="col">Ilość</th>
+                            <th scope="col">Data</th>
+                            <th scope="col">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        {% for sale in sales %}
+                        <tr>
+                            <td><span data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{sale.id}}">{{sale.id|truncatechars:10}}</span></td>
+                            <td>{{sale.product_id.name}}</td>
+                            <td>{{sale.user_sold_id.username}}</td>
+                            <td>{{sale.amount}}</td>
+                            <td>{{sale.date}}</td>
+                            <td>
+                                <form method="post">
+                                    {% csrf_token %}
+
+                                    <input type="hidden" name="sale_id" value="{{sale.id}}">
+                                    <input type="hidden" name="submit" value="Cofnij">
+                                
+                                    <button type="submit" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Cofnij sprzedaż">
+                                        <i class="bi bi-arrow-90deg-left"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+    searchTable = function (input_id, table_id) {
+        var input, filter, table, tr, td, i, txtValue;
+
+        input = document.getElementById(input_id);
+        filter = input.value.toUpperCase();
+        table = document.getElementById(table_id);
+        tr = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+
+        for (i = 0; i < tr.length; i++) {
+            tds = tr[i].getElementsByTagName("td");
+            var fullText = "";
+
+            if (!tds) continue;
+
+            for (let element of tds) {
+                let txtval = element.textContent || element.innerText;
+                fullText += txtval;
+            };
+
+            fullText = fullText.trim();
+
+            if (fullText.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    };
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block title %} Produkt {% endblock %}
+{% block content %}
+{% load static %}
+
+<div class="d-flex flex-column align-items-start justify-content-center flex-wrap me-2 mb-3">
+    <h1 class="text-dark fw-light my-1 fs-2">{% if productvar %}Szczegóły produktu{% else %}Nowy produkt{% endif %}</h1>
+
+    <ul class="breadcrumb fw-semibold fs-base my-1">
+        <li class="breadcrumb-item text-muted">Produkty</li>
+        <li class="breadcrumb-item text-muted">Lista produktów</li>
+        <li class="breadcrumb-item text-dark">Szczegóły</li>
+    </ul>
+</div>
+
+{% if productvar %}
+<a href="{% url 'products' %}" class="btn btn-secondary my-3"><i class="bi bi-arrow-left-circle-fill me-2"></i>Powrót</a>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+
+    
+    <h5 class="mb-3">Podstawowe dane</h5>
+
+    {% if productvar %} <input type="hidden" name="product_id" value="{{productvar.id}}"> {% endif %}
+
+    <div class="form-floating my-2">
+        <input type="text" class="form-control" id="floatingProductName" name="product_name" placeholder="Nazwa" {% if productvar %}value="{{ productvar.name }}"{% endif %}>
+        <label for="floatingProductName">Nazwa produktu</label>
+    </div>
+
+    <div class="form-floating my-3">
+        <textarea class="form-control" placeholder="Opis" id="floatingDesc" name="product_desc" style="height: 200px">{% if productvar %}{{ productvar.description }}{% endif %}</textarea>
+        <label for="floatingDesc">Opis</label>
+    </div>
+
+    <div class="input-group my-2">
+        <div class="form-floating">
+            <input type="number" numtype="float" min="0" step="0.01" class="form-control" id="floatingProductPrice" name="product_price" placeholder="Cena za sztukę" {% if productvar %}value="{{ productvar.price|stringformat:'.2f' }}"{% endif %}>
+            <label for="floatingProductPrice">Cena za sztukę</label>
+        </div>
+        <span class="input-group-text">zł / szt.</span>
+    </div>
+
+    <div class="form-floating">
+        <input type="number" min="0" step="1" class="form-control" id="floatingProductAmount" name="product_amount" placeholder="Ilość" {% if productvar %}value="{{ productvar.amount }}"{% endif %}>
+        <label for="floatingProductAmount">Ilość</label>
+    </div>
+
+    {% if messages %}
+        <div class="text-danger text-center my-3">
+            {% for msg in messages %}
+                <p>{{ msg }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="text-center mt-3">
+        {% if productvar and can_delete %}
+            <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#staticBackdropDelete">Usuń</a>
+        {% else %}
+            {% if not productvar %}
+            <a href="{% url 'products' %}" class="btn btn-secondary">Anuluj</a>
+            {% endif %}
+        {% endif %}
+       <input class="btn btn-accent" name="submit" type="submit" value="Zatwierdź">
+    </div>
+
+    {% if productvar and can_delete %}
+    <div class="modal fade" id="staticBackdropDelete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Usuwanie</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Czy na pewno chcesz usunąć produkt <strong>{{ productvar.name }}</strong> wraz z danymi jego sprzedaży? Ta czynność jest nieodwracalna.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <input type="submit" class="btn btn-danger" name="submit" value="Usuń">
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</form>
+
+{% if productvar %}
+<form method="post">
+    {% csrf_token %}
+
+    <h5 class="my-3">Sprzedaż</h5>
+
+    <input type="hidden" name="product_id" value="{{productvar.id}}">
+
+    <div class="form-floating">
+        <input type="number" min="0" max="{{ productvar.amount }}" step="1" class="form-control" id="floatingProductAmount" name="product_amount" placeholder="Ilość" value="0">
+        <label for="floatingProductAmount">Liczba sztuk tego produktu do sprzedania</label>
+    </div>
+
+    <div class="text-center mt-3">
+        <input class="btn btn-accent" name="submit" type="submit" value="Sprzedaj">
+    </div>
+</form>
+{% endif %}
+    
+{% endblock %}
+
+{% block js %}
+    $('input[numtype=float]').mask('0,00', { reverse: true });
+{% endblock %}

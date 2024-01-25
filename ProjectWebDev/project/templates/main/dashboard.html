@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %} Panel informacyjny {% endblock %}
+{% block content %}
+{% load static %}
+
+<div class="d-flex flex-column align-items-start justify-content-center flex-wrap me-2 mb-3">
+    <h1 class="text-dark fw-light my-1 fs-2">Informacje</h1>
+
+    <ul class="breadcrumb fw-semibold fs-base my-1">
+        <li class="breadcrumb-item text-muted">Panel informacyjny</li>
+        <li class="breadcrumb-item text-dark">Dane</li>
+    </ul>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 g-4 justify-content-center align-middle">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-center">Dostępność produktów</h5>
+                <div style="height: 250px;">
+                    <canvas id="products-available-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-center">Zarejestrowani pracownicy</h5>
+                <div style="height: 250px;">
+                    <canvas id="users-list-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Twoje statystyki</h5>
+                <div class="card-text">
+                    <ul>
+                        <li><strong>{{ user_added_count|floatformat:2 }}</strong>% wszystkich typów produktów zostało dodanych przez Ciebie.</li>
+                        <li>Sprzedane przez Ciebie produkty mają łącznie wartość <strong>{{ user_sold_price|floatformat:2 }}</strong> zł.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+    // dostępność produktów
+    var ctx = document.getElementById("products-available-chart").getContext("2d");
+    var productsAvailableChart = new Chart(ctx, {
+        type: "pie",
+        data: {
+            labels: ["Sprzedane", "Dostępne w magazynie"],
+            datasets: [
+                {
+                    label: "Produkty",
+                    data: [{{ sold_amount }}, {{ products_amount }}],
+                    backgroundColor: ["#ddd", "rgb(0, 152, 68)"],
+                    hoverOffset: 4,
+                },
+            ]
+        },
+        options: {  
+            responsive: true,
+            maintainAspectRatio: false,
+        },
+    });
+
+    var ctx = document.getElementById("users-list-chart").getContext("2d");
+    var productsAvailableChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: ["Zwykli pracownicy", "Kierownicy", "Obecnie aktywny personel"],
+            datasets: [
+                {
+                    label: "Użytkownicy",
+                    data: [{{ normal_users }}, {{ staff_users }}, {{ active_users }}],
+                    backgroundColor: ["#ddd", "rgb(0, 152, 68)", "rgb(0, 95, 43)"],
+                    hoverOffset: 4,
+                    barPercentage: 0.75,
+                },
+            ]
+        },
+        options: {  
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    grid: {
+                        offset: true,
+                    },
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                    }
+                },
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+            }
+        },
+    });
+{% endblock %}

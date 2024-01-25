@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %} Zarządzanie użytkownikiem {% endblock %}
+{% block content %}
+{% load static %}
+
+<div class="d-flex flex-column align-items-start justify-content-center flex-wrap me-2 mb-3">
+    <h1 class="text-dark fw-light my-1 fs-2">{% if uservar %}Zarządzaj pracownikiem{% else %}Nowy pracownik{% endif %}</h1>
+
+    <ul class="breadcrumb fw-semibold fs-base my-1">
+        <li class="breadcrumb-item text-muted">Konta</li>
+        <li class="breadcrumb-item text-muted">Zarządzanie kontami pracowników</li>
+        <li class="breadcrumb-item text-dark">Pracownik</li>
+    </ul>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+
+    <h5 class="mb-3">Dane podstawowe</h5>
+
+    <div class="form-floating my-2">
+        <input type="text" class="form-control {% if uservar %}bg-light{% endif %}" id="floatingUsername" name="username" placeholder="Nazwa użytkownika" {% if uservar %}value="{{ uservar.username }}" readonly{% endif %}>
+        <label for="floatingUsername">Nazwa użytkownika</label>
+    </div>
+    <div class="form-floating my-2">
+        <input type="text" class="form-control" id="floatingFirstname" name="first_name" placeholder="Imię" {% if uservar %}value="{{ uservar.first_name }}"{% endif %}>
+        <label for="floatingFirstname">Imię</label>
+    </div>
+    <div class="form-floating my-2">
+        <input type="text" class="form-control" id="floatingLastname" name="last_name" placeholder="Nazwisko" {% if uservar %}value="{{ uservar.last_name }}"{% endif %}>
+        <label for="floatingLastname">Nazwisko</label>
+    </div>
+
+    <h5 class="my-3">Kierownictwo</h5>
+
+    <div class="form-check form-switch my-3">
+        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchAdmin" name="user_staff" {% if uservar and uservar.is_staff %}checked{% endif %}>
+        <label class="form-check-label" for="flexSwitchAdmin">Pracownik jest kierownikiem</label>
+    </div>
+
+    <h5 class="my-3">Hasło</h5>
+    {% if uservar %}<p class="mb-3">Jeśli nie chcesz zmieniać hasła, pozostaw poniższe pola puste.</p>{% endif %}
+
+    <div class="form-floating my-2">
+        <input type="password" class="form-control" id="floatingPassword1" name="password1" placeholder="Hasło">
+        <label for="floatingPassword1">Hasło</label>
+    </div>
+    <div class="form-floating my-2">
+        <input type="password" class="form-control" id="floatingPassword2" name="password2" placeholder="Hasło">
+        <label for="floatingPassword2">Powtórz hasło</label>
+    </div>
+
+    {% if messages %}
+        <div class="text-danger text-center my-3">
+            {% for msg in messages %}
+                <p>{{ msg }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="text-center mt-3">
+       <a href="{% url 'accounts' %}" class="btn btn-secondary">Anuluj</a>
+       {% if uservar %}<a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#staticBackdropDelete">Usuń</a>{% endif %}
+       <input class="btn btn-accent" name="submit" type="submit" value="Zatwierdź">
+    </div>
+
+    {% if uservar %}
+    <div class="modal fade" id="staticBackdropDelete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Usuwanie</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Czy na pewno chcesz usunąć użytkownika <strong>{{ uservar.username }}</strong> oraz wszystkie elementy z nim związane? Tej operacji nie można cofnąć.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <input type="submit" class="btn btn-danger" name="submit" value="Usuń">
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</form>
+
+{% endblock %}

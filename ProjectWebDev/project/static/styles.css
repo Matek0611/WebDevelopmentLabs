@@ -1,0 +1,146 @@
+/* Style strony */
+
+* {
+    --accent: rgb(0, 152, 68);
+    --accent-light: rgb(0, 168, 75);
+    --accent-second: rgb(0, 116, 52);
+    --accent-second-dark: rgb(0, 95, 43);
+
+    --bs-nav-link-color: var(--accent-second);
+    --bs-nav-link-hover-color: var(--accent-second-dark);
+}
+
+*::selection {
+    background-color: var(--accent-second);
+    color: #fff;
+}
+
+*::-webkit-scrollbar {
+    background-color: #fff;
+    width: 16px;
+}
+
+*::-webkit-scrollbar-track {
+    background-color: #fff;
+}
+
+*::-webkit-scrollbar-track:hover {
+    background-color: #f4f4f4
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: #babac0;
+    border-radius: 16px;
+    border: 5px solid #fff;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: var(--accent-second);
+    border: 4px solid #f4f4f4;
+}
+
+*::-webkit-scrollbar-button {
+    display: none;
+}
+
+body {
+    color: #444;
+}
+
+.k-topbar {
+    height: 60px !important;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0px 10px 30px 0px rgba(82, 63, 105, 0.1);
+    backdrop-filter: blur(5px);
+    border-bottom: 2px solid var(--accent);
+}
+
+.bg-accent {
+    background-color: var(--accent);
+}
+
+.border-accent {
+    border-color: var(--accent);
+}
+
+.bg-accent-second {
+    background-color: var(--accent-second);
+}
+
+.text-accent {
+    color: var(--accent) !important;
+}
+
+.text-accent-secondary {
+    color: var(--accent-second) !important;
+}
+
+.btn-accent {
+    transition: all 0.3s ease-in-out;
+    background-color: #00ff2a44;
+    color: var(--accent);
+    font-weight: 600;
+    border: 2px solid transparent;
+}
+
+.btn-accent:hover {
+    background-color: #00ff2a44;
+    color: var(--accent-light);
+    border-color: var(--accent);
+}
+
+.btn-accent:focus {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-accent-outline {
+    transition: all 0.3s ease-in-out;
+    background-color: #fff;
+    color: #888;
+    font-weight: 600;
+    border: 1px solid #fff;
+}
+
+.btn-accent-outline:hover {
+    background-color: #ffd00055;
+    color: var(--accent-second-dark);
+    border-color: var(--accent-second);
+}
+
+.btn-accent-outline:focus {
+    color: var(--accent-second);
+    background-color: #fff;
+}
+
+.form-control:focus, .form-select:focus, .form-check-input:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 0.25rem #00ff2a44 !important;
+}
+
+.dropdown-item, .nav-item, .nav-link {
+    padding: 7px;
+    clear: both;
+    font-weight: 600;
+    color: #555;
+    white-space: nowrap;
+    background-color: transparent !important;
+    border: 0;
+    border-radius: 5px;
+    transition: all 0.4s ease !important;
+}
+
+.dropdown-item {
+    display: block;
+    width: 100%;
+}
+
+.dropdown-item.active, .dropdown-item:active, .nav-link.active {
+    background: var(--accent) !important;
+    color: white !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--accent) !important;
+    border-color: var(--accent) !important;
+}
